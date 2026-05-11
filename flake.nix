@@ -22,6 +22,10 @@
     nixos-hardware.url =
       "github:NixOS/nixos-hardware";
 
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell/stable";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -31,6 +35,7 @@
     agenix,
     disko,
     nixos-hardware,
+    dms,
     ...
   }:
   let
@@ -47,6 +52,7 @@
             agenix
             disko
             nixos-hardware
+            dms
             ;
         };
 
