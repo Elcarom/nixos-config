@@ -1,10 +1,11 @@
 {
+  nixos-hardware,
   ...
 }:
 
 {
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/nixos";
-    fsType = "ext4";
-  };
+  imports = [
+    nixos-hardware.nixosModules.common-cpu-amd
+    nixos-hardware.nixosModules.common-pc-ssd
+  ];
 }

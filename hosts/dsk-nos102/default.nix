@@ -13,6 +13,7 @@
   imports = [
     
     ./hardware.nix
+    ./disko.nix
 
     ../../modules/nixos/core/boot.nix
     ../../modules/nixos/core/locale.nix
@@ -21,7 +22,23 @@
     ../../modules/nixos/core/ssh.nix
     ../../modules/nixos/core/users.nix
 
+    ../../modules/nixos/optional/zram.nix
+    ../../modules/nixos/optional/snapshots.nix
+
     ../../modules/nixos/users/matthew.nix
     ../../modules/nixos/users/camille.nix
   ];
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+
+    users = {
+      matthew =
+        import ../../home/matthew/dsk-nos102.nix;
+
+      camille =
+        import ../../home/camille/dsk-nos102.nix;
+    };
+  };
 }
