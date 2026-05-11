@@ -27,6 +27,7 @@
     ../../modules/nixos/optional/nvidia.nix
     ../../modules/nixos/optional/audio.nix
     ../../modules/nixos/optional/steam.nix
+    ../../modules/nixos/optional/docker.nix
 
     ../../modules/nixos/users/matthew.nix
     ../../modules/nixos/users/camille.nix
