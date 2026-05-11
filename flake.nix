@@ -1,5 +1,5 @@
 {
-  description = "Elcarom NixOS Configuration";
+  description = "Elcarom NixOS configuration";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -13,42 +13,50 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixos-hardware.url =
+      "github:NixOS/nixos-hardware";
+
   };
 
-  outputs = inputs@{
+  outputs = {
     self,
     nixpkgs,
     home-manager,
     agenix,
+    disko,
+    nixos-hardware,
     ...
-  }: {
-    nixosConfigurations = {
-      svr-dsk102 = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+  }:
+  let
+    system = "x86_64-linux";
+  in
+  {
+    nixosConfigurations.dsk-nos102 =
+      nixpkgs.lib.nixosSystem {
+        inherit system;
 
         specialArgs = {
-          inherit inputs;
+          inherit
+            self
+            agenix
+            disko
+            nixos-hardware
+            ;
         };
 
         modules = [
-          ./hosts/svr-dsk102/default.nix
+          ./hosts/dsk-nos102/default.nix
 
           home-manager.nixosModules.home-manager
-
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-
-            home-manager.users.matt =
-              import ./home/matt/default.nix;
-
-            home-manager.users.camille =
-              import ./home/camille/default.nix;
-          }
-
           agenix.nixosModules.default
+          disko.nixosModules.disko
         ];
       };
-    };
   };
 }
