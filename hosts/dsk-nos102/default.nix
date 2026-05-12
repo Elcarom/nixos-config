@@ -30,6 +30,7 @@
     ../../modules/nixos/optional/docker.nix
     ../../modules/nixos/optional/greeter-dms.nix
     ../../modules/nixos/optional/hyprland-dms.nix
+    ../../modules/nixos/optional/comfyui.nix
 
     ../../modules/nixos/users/matthew.nix
     ../../modules/nixos/users/camille.nix
