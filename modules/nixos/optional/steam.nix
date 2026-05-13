@@ -1,5 +1,5 @@
 {
-  pkgs,
+  proton-cachyos,
   ...
 }:
 
@@ -7,12 +7,8 @@
   programs.steam = {
     enable = true;
 
-    remotePlay.openFirewall = false;
-    dedicatedServer.openFirewall = false;
+    extraCompatPackages = [
+      proton-cachyos
+    ];
   };
-
-  environment.systemPackages = with pkgs; [
-    mangohud
-    protonup-ng
-  ];
 }

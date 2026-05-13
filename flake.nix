@@ -54,6 +54,8 @@
             nixos-hardware
             dms
             ;
+
+          proton-cachyos = self.packages.${system}.proton-cachyos;
         };
 
         modules = [
