@@ -64,5 +64,15 @@
           disko.nixosModules.disko
         ];
       };
+
+      packages.${system} = {
+        proton-cachyos =
+          nixpkgs.legacyPackages.${system}.callPackage
+            ./pkgs/proton-cachyos { };
+
+        update-proton-cachyos =
+          nixpkgs.legacyPackages.${system}.callPackage
+            ./pkgs/proton-cachyos/update.nix { };
+};
   };
 }
