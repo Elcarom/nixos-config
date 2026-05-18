@@ -1,13 +1,11 @@
-{
-  ...
-}:
+{ disk, ... }:
 
 {
   disko.devices = {
     disk = {
       main = {
         type = "disk";
-        device = "/dev/nvme0n1";
+        device = disk;
 
         content = {
           type = "gpt";
