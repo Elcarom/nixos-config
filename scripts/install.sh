@@ -60,31 +60,25 @@ fi
 echo "Disk safety checks passed."
 
 echo
-read -rp "Type ERASE to continue: " CONFIRM
+read -rp "Type CONTINUE to continue: " CONFIRM
 
-if [[ "$CONFIRM" != "ERASE" ]]; then
+if [[ "$CONFIRM" != "CONTINUE" ]]; then
   echo "Aborted."
   exit 1
 fi
 
-cat > /tmp/install-args.nix <<EOF
-{
-  _module.args.disk = "$DISK";
-}
-EOF
+echo
+echo "Running Disko..."
+
+sudo "$(which nix)" run github:nix-community/disko -- \
+  --mode destroy,format,mount \
+  "hosts/$HOST/disko.nix" \
+  --argstr disk "$DISK"
 
 echo
-echo "Generated deployment args:"
-cat /tmp/install-args.nix
+echo "Installing NixOS..."
 
-echo
-echo "Disko command prepared."
+sudo nixos-install \
+  --flake ".#$HOST" \
+  --no-root-password
 
-echo
-echo "When running from a live ISO, this command will execute:"
-echo
-
-echo "sudo \"\$(which nix)\" run github:nix-community/disko -- \\"
-echo "  --mode destroy,format,mount \\"
-echo "  hosts/$HOST/disko.nix \\"
-echo "  --argstr disk \"$DISK\""
