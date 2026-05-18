@@ -14,4 +14,6 @@
     variant = "";
   };
 
+  boot.initrd.systemd.enable = true;
+
 }
