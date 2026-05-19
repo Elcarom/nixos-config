@@ -14,6 +14,9 @@ if [[ ! -d "hosts/$HOST" ]]; then
   exit 1
 fi
 
+NIX_BIN="$(command -v nix)"
+export NIX_CONFIG="experimental-features = nix-command flakes"
+
 echo "Installing host: $HOST"
 
 echo
@@ -21,7 +24,7 @@ echo "Available disks:"
 
 mapfile -t DISKS < <(
   lsblk -d -n -o NAME,SIZE,MODEL \
-    | grep -E 'sd|nvme'
+    | grep -E '^(sd|nvme)'
 )
 
 for i in "${!DISKS[@]}"; do
@@ -30,6 +33,12 @@ done
 
 echo
 read -rp "Select disk number: " DISK_INDEX
+
+if ! [[ "$DISK_INDEX" =~ ^[0-9]+$ ]] || \
+   (( DISK_INDEX < 1 || DISK_INDEX > ${#DISKS[@]} )); then
+  echo "Invalid disk selection."
+  exit 1
+fi
 
 DISK_LINE="${DISKS[$((DISK_INDEX - 1))]}"
 
@@ -67,10 +76,13 @@ if [[ "$CONFIRM" != "CONTINUE" ]]; then
   exit 1
 fi
 
+sudo umount -R /mnt 2>/dev/null || true
+sudo cryptsetup close cryptroot 2>/dev/null || true
+
 echo
 echo "Running Disko..."
 
-sudo "$(which nix)" run github:nix-community/disko -- \
+sudo --preserve-env=NIX_CONFIG "$NIX_BIN" run github:nix-community/disko -- \
   --mode destroy,format,mount \
   "hosts/$HOST/disko.nix" \
   --argstr disk "$DISK"
@@ -78,7 +90,16 @@ sudo "$(which nix)" run github:nix-community/disko -- \
 echo
 echo "Installing NixOS..."
 
-sudo nixos-install \
+sudo --preserve-env=NIX_CONFIG nixos-install \
   --flake ".#$HOST" \
   --no-root-password
 
+echo
+echo "Installation complete."
+
+echo
+read -rp "Reboot now? [y/N]: " REBOOT
+
+if [[ "$REBOOT" =~ ^[Yy]$ ]]; then
+  reboot
+fi
