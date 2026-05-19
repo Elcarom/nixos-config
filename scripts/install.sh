@@ -84,6 +84,7 @@ echo "Running Disko..."
 
 sudo --preserve-env=NIX_CONFIG "$NIX_BIN" run github:nix-community/disko -- \
   --mode destroy,format,mount \
+  --yes-wipe-all-disks \
   "hosts/$HOST/disko.nix" \
   --argstr disk "$DISK"
 
@@ -95,11 +96,45 @@ sudo --preserve-env=NIX_CONFIG nixos-install \
   --no-root-password
 
 echo
-echo "Installation complete."
+echo "Checking TPM2 availability..."
+
+if systemd-analyze has-tpm2 | grep -q yes; then
+  echo "TPM2 detected."
+
+  read -rp "Enroll TPM2 auto-unlock? [y/N]: " TPM_ENROLL
+
+  if [[ "$TPM_ENROLL" =~ ^[Yy]$ ]]; then
+    echo
+    echo "Enrolling TPM2 unlock..."
+
+    sudo systemd-cryptenroll \
+      --tpm2-device=auto \
+      /dev/disk/by-partlabel/disk-main-luks
+
+    echo
+    echo "TPM2 enrollment complete."
+
+    echo
+    echo "Current LUKS slots/tokens:"
+
+    sudo cryptsetup luksDump \
+      /dev/disk/by-partlabel/disk-main-luks
+  fi
+else
+  echo "No TPM2 detected."
+fi
+
+echo
+echo "System installed successfully."
+echo
+echo "Host: $HOST"
+echo "Disk: $DISK"
+echo
+echo "You may now reboot into NixOS."
 
 echo
 read -rp "Reboot now? [y/N]: " REBOOT
 
 if [[ "$REBOOT" =~ ^[Yy]$ ]]; then
-  reboot
+  sudo reboot
 fi

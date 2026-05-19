@@ -14,6 +14,8 @@
     variant = "";
   };
 
+  services.xserver.exportConfiguration = true;
+
   boot.initrd.systemd.enable = true;
 
 }

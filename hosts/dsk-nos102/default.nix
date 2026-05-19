@@ -27,8 +27,7 @@
     ../../modules/nixos/optional/nvidia.nix
     ../../modules/nixos/optional/audio.nix
     ../../modules/nixos/optional/docker.nix
-    ../../modules/nixos/optional/greeter-dms.nix
-    ../../modules/nixos/optional/hyprland-dms.nix
+    ../../modules/nixos/optional/plasma.nix
     ../../modules/nixos/optional/comfyui.nix
     ../../modules/nixos/optional/mediamtx.nix
     ../../modules/nixos/optional/restic.nix
