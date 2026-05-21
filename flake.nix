@@ -9,11 +9,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,60 +16,71 @@
 
     nixos-hardware.url =
       "github:NixOS/nixos-hardware";
-
-    dms = {
-      url = "github:AvengeMedia/DankMaterialShell/stable";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = {
     self,
     nixpkgs,
     home-manager,
-    agenix,
     disko,
     nixos-hardware,
-    dms,
     ...
   }:
   let
-    system = "x86_64-linux";
+    systems = [
+      "x86_64-linux"
+    ];
+
+    forAllSystems =
+      nixpkgs.lib.genAttrs systems;
   in
   {
+    overlays.default = final: prev: {
+      proton-cachyos =
+        final.callPackage
+          ./pkgs/proton-cachyos { };
+    };
+
+    packages = forAllSystems (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in {
+        proton-cachyos =
+          pkgs.callPackage
+            ./pkgs/proton-cachyos { };
+
+        update-proton-cachyos =
+          pkgs.callPackage
+            ./pkgs/proton-cachyos/update.nix { };
+      });
+
+    formatter = forAllSystems (system:
+      nixpkgs.legacyPackages.${system}.nixfmt-rfc-style
+    );
+
     nixosConfigurations.dsk-nos102 =
       nixpkgs.lib.nixosSystem {
-        inherit system;
+        system = "x86_64-linux";
 
-        specialArgs = {
-          inherit
-            self
-            agenix
-            disko
-            nixos-hardware
-            dms
-            ;
+    specialArgs = {
+      inherit self;
 
-          proton-cachyos = self.packages.${system}.proton-cachyos;
-        };
+      hardwareModules =
+        nixos-hardware.nixosModules;
+    };
 
         modules = [
           ./hosts/dsk-nos102/default.nix
 
           home-manager.nixosModules.home-manager
-          agenix.nixosModules.default
-          disko.nixosModules.disko
+          disko.nixosModules.default
+
+          {
+            nixpkgs.overlays = [
+              self.overlays.default
+            ];
+          }
         ];
       };
-
-      packages.${system} = {
-        proton-cachyos =
-          nixpkgs.legacyPackages.${system}.callPackage
-            ./pkgs/proton-cachyos { };
-
-        update-proton-cachyos =
-          nixpkgs.legacyPackages.${system}.callPackage
-            ./pkgs/proton-cachyos/update.nix { };
-};
   };
 }

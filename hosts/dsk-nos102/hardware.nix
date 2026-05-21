@@ -1,11 +1,11 @@
 {
-  nixos-hardware,
+  hardwareModules,
   ...
 }:
 
 {
   imports = [
-    nixos-hardware.nixosModules.common-cpu-amd
-    nixos-hardware.nixosModules.common-pc-ssd
+    hardwareModules.common-cpu-amd
+    hardwareModules.common-pc-ssd
   ];
 }

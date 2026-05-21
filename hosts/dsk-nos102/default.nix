@@ -15,12 +15,7 @@
     ./hardware.nix
     ./disko.nix
 
-    ../../modules/nixos/core/boot.nix
-    ../../modules/nixos/core/locale.nix
-    ../../modules/nixos/core/networking.nix
-    ../../modules/nixos/core/nix.nix
-    ../../modules/nixos/core/ssh.nix
-    ../../modules/nixos/core/users.nix
+    ../../modules/nixos/core
 
     ../../modules/nixos/optional/zram.nix
     ../../modules/nixos/optional/snapshots.nix
