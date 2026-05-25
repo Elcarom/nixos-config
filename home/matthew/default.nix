@@ -1,5 +1,7 @@
 {
   config,
+  lib,
+  pkgs,
   ...
 }:
 
@@ -15,10 +17,25 @@
 
   programs.home-manager.enable = true;
 
-  programs.git.settings.user = {
+  programs.git = {
+    enable = true;
 
-    name = "Elcarom";
-    email = "signup@elcarom.me";
+    settings = {
+      user = {
+        name = "Elcarom";
+        email = "signup@elcarom.me";
+      };
+
+      gpg.format = "ssh";
+
+      url."git@github.com:".insteadOf = "https://github.com/";
+
+    };
+
+    signing = {
+      signByDefault = true;
+      key = "~/.ssh/id_ed25519.pub";
+    };
 
   };
 }

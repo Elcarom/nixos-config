@@ -23,9 +23,9 @@
     ../../modules/nixos/optional/audio.nix
     ../../modules/nixos/optional/docker.nix
     ../../modules/nixos/optional/plasma.nix
-    ../../modules/nixos/optional/comfyui.nix
     ../../modules/nixos/optional/mediamtx.nix
     ../../modules/nixos/optional/restic.nix
+    ../../modules/nixos/optional/steam.nix
 
     ../../modules/nixos/users/matthew.nix
     ../../modules/nixos/users/camille.nix

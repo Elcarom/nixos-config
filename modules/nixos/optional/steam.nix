@@ -1,5 +1,5 @@
 {
-  proton-cachyos,
+  pkgs,
   ...
 }:
 
@@ -7,8 +7,8 @@
   programs.steam = {
     enable = true;
 
-    extraCompatPackages = [
-      proton-cachyos
+    extraCompatPackages = with pkgs; [
+      nur.repos.mio.proton-cachyos
     ];
   };
 }

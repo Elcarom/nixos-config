@@ -2,20 +2,35 @@
   description = "Elcarom NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url =
+      "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url =
+        "github:nix-community/home-manager";
+
+      inputs.nixpkgs.follows =
+        "nixpkgs";
     };
 
     disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url =
+        "github:nix-community/disko";
+
+      inputs.nixpkgs.follows =
+        "nixpkgs";
     };
 
     nixos-hardware.url =
       "github:NixOS/nixos-hardware";
+
+    nur = {
+      url =
+        "github:nix-community/NUR";
+
+      inputs.nixpkgs.follows =
+        "nixpkgs";
+    };
   };
 
   outputs = {
@@ -24,6 +39,7 @@
     home-manager,
     disko,
     nixos-hardware,
+    nur,
     ...
   }:
   let
@@ -33,53 +49,46 @@
 
     forAllSystems =
       nixpkgs.lib.genAttrs systems;
+
+    mkPkgs = system:
+      import nixpkgs {
+        inherit system;
+
+        config = {
+          allowUnfree = true;
+        };
+
+        overlays = [
+          nur.overlays.default
+        ];
+      };
   in
   {
-    overlays.default = final: prev: {
-      proton-cachyos =
-        final.callPackage
-          ./pkgs/proton-cachyos { };
-    };
-
-    packages = forAllSystems (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in {
-        proton-cachyos =
-          pkgs.callPackage
-            ./pkgs/proton-cachyos { };
-
-        update-proton-cachyos =
-          pkgs.callPackage
-            ./pkgs/proton-cachyos/update.nix { };
-      });
-
-    formatter = forAllSystems (system:
-      nixpkgs.legacyPackages.${system}.nixfmt-rfc-style
+    formatter = forAllSystems (
+      system:
+      (mkPkgs system).nixfmt-rfc-style
     );
 
     nixosConfigurations.dsk-nos102 =
       nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
 
-    specialArgs = {
-      inherit self;
+        pkgs =
+          mkPkgs "x86_64-linux";
 
-      hardwareModules =
-        nixos-hardware.nixosModules;
-    };
+        specialArgs = {
+          inherit self;
+
+          hardwareModules =
+            nixos-hardware.nixosModules;
+        };
 
         modules = [
           ./hosts/dsk-nos102/default.nix
 
           home-manager.nixosModules.home-manager
-          disko.nixosModules.default
 
-          {
-            nixpkgs.overlays = [
-              self.overlays.default
-            ];
-          }
+          disko.nixosModules.default
         ];
       };
   };
